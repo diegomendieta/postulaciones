@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "ruuf/.next": true,
+    "ruuf/node_modules": true,
+    "ruuf/next-env.d.ts": true,
+  }
+}
