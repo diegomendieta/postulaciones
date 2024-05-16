@@ -17,3 +17,8 @@ interface Roof {
   dimensions: RectangularDimensions;
   topLeftCoordinate: Coordinate;
 }
+
+interface RoofSolution {
+  panel: Panel;
+  splitDirection: 'horizontally' | 'vertically'
+}

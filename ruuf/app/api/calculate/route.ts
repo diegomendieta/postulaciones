@@ -1,3 +1,4 @@
+import { getMaxAndIndex } from "@/app/utils";
 import { rotate, splitRoof, isFeasibleToPlacePanel } from "./helpers"
 import { Memory } from "./memory";
 
@@ -25,45 +26,53 @@ export async function POST(request: Request) {
   }
 
   function maxAmountOfPanelsInRoof(roof: Roof) {
-    const memoizedAmount = memory.get(roof.dimensions);
+    const memoizedAmount = memory.getValue(roof.dimensions);
     if (memoizedAmount !== null) {
       return memoizedAmount
     }
+
+    const splittedRoofs: Array<[Roof, Roof]> = [];
+    const solutions: RoofSolution[] = [];
   
     const panel: Panel = {
       topLeftCoordinate: roof.topLeftCoordinate,
       dimensions: panelDimensions
     }
-  
-    const roofs = [];
-  
     if (isFeasibleToPlacePanel(roof, panel)) {
       const [roof1, roof2] = splitRoof(roof, panel, 'horizontally');
       const [roof3, roof4] = splitRoof(roof, panel, 'vertically');
   
-      roofs.push([roof1, roof2]);
-      roofs.push([roof3, roof4]);
+      splittedRoofs.push([roof1, roof2]);
+      solutions.push({ panel, splitDirection: 'horizontally' })
+
+      splittedRoofs.push([roof3, roof4]);
+      solutions.push({ panel, splitDirection: 'vertically' })
     };
 
     const rotatedPanel = rotate(panel);
     if (isFeasibleToPlacePanel(roof, rotatedPanel)) {
       const [roof5, roof6] = splitRoof(roof, rotatedPanel, 'horizontally');
       const [roof7, roof8] = splitRoof(roof, rotatedPanel, 'vertically');
-  
-      roofs.push([roof5, roof6]);
-      roofs.push([roof7, roof8]);
+
+      splittedRoofs.push([roof5, roof6]);
+      solutions.push({ panel: rotatedPanel, splitDirection: 'horizontally' })
+
+      splittedRoofs.push([roof7, roof8]);
+      solutions.push({ panel: rotatedPanel, splitDirection: 'vertically' })
     };
   
-    const mappedMaxAmountOfPanels = roofs.map((roofs) => {
+    const mappedMaxAmountOfPanels = splittedRoofs.map((roofs) => {
       const [roof1, roof2] = roofs;
     
       return 1 + maxAmountOfPanelsInRoof(roof1) + maxAmountOfPanelsInRoof(roof2)
     })
   
     const maxAmountOfPanelsArray: number[] = [0, ...mappedMaxAmountOfPanels];
-    const max = Math.max(...maxAmountOfPanelsArray);
+    const { max, index } = getMaxAndIndex(maxAmountOfPanelsArray);
 
-    memory.add(roof.dimensions, max);
+    const solution = solutions[index];
+
+    memory.add(roof.dimensions, { value: max, solution });
   
     return max;
   }

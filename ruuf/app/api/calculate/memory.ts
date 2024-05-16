@@ -1,25 +1,34 @@
 export class Memory {
-  private memo: { [key: string]: number };
+  private memo: {
+    [key: string]: {
+      value: number;
+      solution: RoofSolution | null;
+    }
+  };
 
   constructor() {
     this.memo = {};
   }
 
-  add(dimensions: RectangularDimensions, numberOfPanels: number) {
+  add(dimensions: RectangularDimensions, obj: { value: number, solution: RoofSolution | null }) {
     const key = this.generateKey(dimensions);
 
-    this.memo[key] = numberOfPanels;
+    this.memo[key] = obj;
   }
 
-  get(dimensions: RectangularDimensions) {
+  getValue(dimensions: RectangularDimensions) {
     const key = this.generateKey(dimensions);
     if (key in this.memo) {
-      return this.memo[key];
+      return this.memo[key].value;
     }
 
-    const reversedKey = this.reverseKey(key);
-    if (reversedKey in this.memo) {
-      return this.memo[reversedKey];
+    return null;
+  }
+
+  getSolution(dimensions: RectangularDimensions) {
+    const key = this.generateKey(dimensions);
+    if (key in this.memo) {
+      return this.memo[key].solution;
     }
 
     return null;
@@ -27,11 +36,5 @@ export class Memory {
 
   private generateKey(dimensions: RectangularDimensions) {
     return `${dimensions.horizontal},${dimensions.vertical}`;
-  }
-
-  private reverseKey(key: string) {
-    const [ horizontal, vertical ] = key.split(',');
-
-    return `${vertical},${horizontal}`;
   }
 }
