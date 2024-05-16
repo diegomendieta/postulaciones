@@ -22,3 +22,16 @@ interface RoofSolution {
   panel: Panel;
   splitDirection: 'horizontally' | 'vertically'
 }
+
+interface PanelPlacement {
+  topLeftCoordinate: Coordinate;
+  dimensions: {
+    horizontal: number;
+    vertical: number;
+  }
+}
+
+interface CalculatePanelsResponse {
+  amount: number;
+  solution: PanelPlacement[]
+}

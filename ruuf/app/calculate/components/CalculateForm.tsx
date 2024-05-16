@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from "react"
+import { SolutionDiagram } from "./SolutionDiagram";
 
 const parseFormData = (formData: FormData) => {
   const roofHeight = formData.get('roofHeight') as string;
@@ -29,6 +30,8 @@ export const CalculateForm = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfPanels, setNumberOfPanels] = useState(0);
+  const [solution, setSolution] = useState<PanelPlacement[]>([]);
+  const [roofDimensions, setRoofDimensions] = useState({ horizontal: 0, vertical: 0 })
 
   const onSubmit = async (formData: FormData) => {
     if (!validateFormData(formData)){
@@ -54,6 +57,8 @@ export const CalculateForm = () => {
       }
     }
 
+    setRoofDimensions({ horizontal: roofWidth, vertical: roofHeight });
+
     const endpoint = '/api/calculate';
     const options = {
       method: 'POST',
@@ -65,10 +70,11 @@ export const CalculateForm = () => {
 
     try {
       const response = await fetch(endpoint, options);
-      const jsonifiedResponse = await response.json();
+      const jsonifiedResponse: CalculatePanelsResponse = await response.json();
   
-      const { amount } = jsonifiedResponse;
+      const { amount, solution } = jsonifiedResponse;
       setNumberOfPanels(amount);
+      setSolution(solution);
     } catch (err) {
       setError('There was an error');
     }
@@ -78,6 +84,7 @@ export const CalculateForm = () => {
 
   return (
     <div>
+      <SolutionDiagram roofDimensions={roofDimensions} solution={solution} />
       <div>
         { error !== '' ? <p>There was an error</p> : null }
         { isLoading ? <p>Loading...</p> : <p>Number of panels: { numberOfPanels }</p> }
