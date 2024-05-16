@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     const splittedRoofs: Array<[Roof, Roof]> = [];
-    const solutions: RoofSolution[] = [];
+    const solutions: Array<RoofSolution | null> = [null];
   
     const panel: Panel = {
       topLeftCoordinate: roof.topLeftCoordinate,
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
       const [roof3, roof4] = splitRoof(roof, panel, 'vertically');
   
       splittedRoofs.push([roof1, roof2]);
-      solutions.push({ panel, splitDirection: 'horizontally' })
+      solutions.push({ panel, splitDirection: 'horizontally' });
 
       splittedRoofs.push([roof3, roof4]);
-      solutions.push({ panel, splitDirection: 'vertically' })
+      solutions.push({ panel, splitDirection: 'vertically' });
     };
 
     const rotatedPanel = rotate(panel);
@@ -86,7 +86,38 @@ export async function POST(request: Request) {
   }
   const amount = maxAmountOfPanelsInRoof(roof);
 
-  return Response.json({
-    amount
-  })
+  const solution: RoofSolution[] = [];
+
+  function retrieveSolution(roof: Roof) {
+    const memoizedSol = memory.getSolution(roof.dimensions);
+    if (memoizedSol === null) {
+      return;
+    }
+
+    const sol: RoofSolution = {
+      panel: {
+        topLeftCoordinate: roof.topLeftCoordinate,
+        dimensions: memoizedSol.panel.dimensions
+      },
+      splitDirection: memoizedSol.splitDirection
+    }
+
+    solution.push(sol);
+    const [roof1, roof2] = splitRoof(roof, sol.panel, sol.splitDirection);
+
+    retrieveSolution(roof1);
+    retrieveSolution(roof2);
+  }
+
+  retrieveSolution(roof);
+
+  const response = {
+    amount,
+    solution: solution.map(sol => ({
+      topLeftCoordinate: sol.panel.topLeftCoordinate,
+      dimensions: sol.panel.dimensions
+    }))
+  };
+
+  return Response.json(response);
 }
