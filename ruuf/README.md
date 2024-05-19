@@ -4,9 +4,9 @@ The problem to be solved consists of finding the maximum number of rectangles wi
 
 ## Solution
 
-The solution consists of a Next.js application with the route `/calculate` and the endpoint `/api/endpoint`.
+The solution consists of a Next.js application with the route `/calculate` and the endpoint `/api/calculate`.
 
-The endpoint `/api/endpoint` receives the dimensions of the roof and the solar panels, and returns the maximum number of solar panels that can be placed on the roof, along with the arrangement in which this is achieved. The graphical representation of the problem can be viewed at the route `/calculate`.
+The endpoint `/api/calculate` receives the dimensions of the roof and the solar panels, and returns the maximum number of solar panels that can be placed on the roof, along with the arrangement in which this is achieved. The graphical representation of the problem can be viewed at the route `/calculate`.
 
 The problem is approached using dynamic programming. Starting from the largest rectangle, a solar panel is placed in the corner, the rest of the rectangle is subdivided into two, and the problem is solved again for the smaller rectangles.
 
