@@ -1,1 +1,1 @@
-# postulaciones
+# Repository with problem-solving solutions for job applications
