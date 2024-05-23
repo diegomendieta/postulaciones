@@ -3,5 +3,6 @@
     "ruuf/.next": true,
     "ruuf/node_modules": true,
     "ruuf/next-env.d.ts": true,
+    "buda/**/__pycache__": true
   }
 }
